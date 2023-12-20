@@ -3,6 +3,7 @@ import Header from './components/Header'
 import TestButton from './components/TestButtons'
 import CubeWindow from './components/cubedisplay/CubeWindow'
 import { MqttCommunication } from './components/MqttCommunication'
+import { useState } from 'react'
 
 // The Connector component is the entry point for the puzzlecube-core library.
 // It connects to the MQTT broker and handles the communication for the cube state.
@@ -19,9 +20,11 @@ const mqttConfig = {
 function App() {
   const { connectionStatus } = useMqttStore()
   const mqttCommunication = MqttCommunication()
+  const [mqttInitialized, setMqttInitialized] = useState(false)
 
-  if (connectionStatus === 'connected') {
-    mqttCommunication.subsribeAndListenToAppState()
+  if (connectionStatus === 'connected' && !mqttInitialized) {
+    mqttCommunication.subscribeAndListenToAppState()
+    setMqttInitialized(true)
   }
 
   return (
