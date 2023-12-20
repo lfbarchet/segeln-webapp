@@ -12,16 +12,13 @@ import { useState } from 'react'
 // It can be configured to connect to a different broker by passing the brokerUrl as a prop.
 // Example: <Connector brokerUrl='localhost:9001' />y
 
-const mqttConfig = {
-  username: 'miniwelt',
-  password: 'pastelquail546',
-}
-
 function App() {
   const { connectionStatus } = useMqttStore()
   const mqttCommunication = MqttCommunication()
   const [mqttInitialized, setMqttInitialized] = useState(false)
 
+  // Check the connection status and subscribe to the app state topic and helloCubes topic and listen for messages
+  // This is done only once when the connection status changes to connected
   if (connectionStatus === 'connected' && !mqttInitialized) {
     mqttCommunication.subscribeAndListenToAppState()
     setMqttInitialized(true)
@@ -30,10 +27,7 @@ function App() {
   return (
     <div className='flex relative'>
       <div className='px-7 min-h-screen h-fit bg-fft-yellow flex-1'>
-        <Connector
-          brokerUrl='ws://localhost:9001'
-          options={mqttConfig}
-        />
+        <Connector />
         <Header />
         <TestButton />
         <CubeWindow />

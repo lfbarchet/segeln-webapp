@@ -2,11 +2,20 @@ import { useMqttStore } from '@mirevi/puzzlecube-core'
 import useStore from '../stores/useStore'
 import useHelloCubeStore from '../stores/useHelloCubeStore'
 
+/**
+ * Custom hook to subscribe to the app state topic and helloCubes topic and listen for messages
+ * Provides a function to send a helloCubes message to the mqtt broker
+ * @returns void
+ */
 export const MqttCommunication = () => {
   const { client } = useMqttStore()
   const { addAppState, existsAppState, updateAppState } = useStore()
   const { addHelloCube } = useHelloCubeStore()
 
+  /**
+   * Subscribe to the app state topic and helloCubes topic and listen for messages
+   * @returns void
+   */
   const subscribeAndListenToAppState = () => {
     if (client) {
       client.subscribe('puzzleCubes/+/app/state')
@@ -32,10 +41,10 @@ export const MqttCommunication = () => {
   }
 
   /**
-   * Send a start message to the mqtt broker
+   * Send a helloCubes message to the mqtt broker
    * @returns void
    */
-  const sendStart = () => {
+  const sendHelloCubes = () => {
     const payload = {
       type: 'helloCubes',
     }
@@ -44,22 +53,8 @@ export const MqttCommunication = () => {
     client.publish('puzzleCubes/app/helloCubes', JSON.stringify(payload))
   }
 
-  /**
-   * Send a stop message to the mqtt broker
-   * @returns void
-   */
-  const sendStop = () => {
-    const payload = {
-      type: 'stop',
-    }
-
-    if (!client) return
-    client.publish('puzzleCubes/app/stop', JSON.stringify(payload))
-  }
-
   return {
     subscribeAndListenToAppState,
-    sendStart,
-    sendStop,
+    sendHelloCubes,
   }
 }

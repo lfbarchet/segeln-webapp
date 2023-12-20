@@ -1,15 +1,19 @@
 import { MqttCommunication } from './MqttCommunication'
 import useHelloCubeStore from '../stores/useHelloCubeStore'
 
+/**
+ * Test button component
+ * @returns JSX.Element
+ */
 const TestButton = () => {
   const { helloCubes } = useHelloCubeStore()
   const mqttCommunication = MqttCommunication()
 
-  const handleStart = () => {
-    mqttCommunication.sendStart()
-  }
-
-  //console.log('helloCubes', helloCubes)
+  /**
+   * Handle the click event on the button
+   * @returns
+   */
+  const handleStart = () => mqttCommunication.sendHelloCubes()
 
   return (
     <div className='flex flex-col justify-center items-center h-80vh gap-10  '>
