@@ -46,7 +46,8 @@ export const MqttCommunication = () => {
    */
   const sendHelloCubes = () => {
     const payload = {
-      type: 'helloCubes',
+      message: 'Hello from Webapp',
+      timestamp: new Date().toISOString().toString(),
     }
 
     if (!client) return

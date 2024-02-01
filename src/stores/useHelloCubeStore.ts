@@ -1,19 +1,19 @@
 import { create } from 'zustand'
 
-export type HelloCube = {
-  $type: string
+export type HelloCubeMessage = {
+  
   message: string
   timestamp: string
 }
 
 type HelloCubeStore = {
-  helloCubes: HelloCube[]
-  addHelloCube: (helloCube: HelloCube) => void
+  helloCubes: HelloCubeMessage[]
+  addHelloCube: (helloCube: HelloCubeMessage) => void
 }
 
 export const useHelloCubeStore = create<HelloCubeStore>((set, get) => ({
   helloCubes: [],
-  addHelloCube: (helloCube) => set((state) => ({ helloCubes: [...state.helloCubes, helloCube] })),
+  addHelloCube: (helloCube) => set((state) => ({ helloCubes: [helloCube, ...state.helloCubes ] })),
 }))
 
 export default useHelloCubeStore
