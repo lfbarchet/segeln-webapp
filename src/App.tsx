@@ -1,4 +1,4 @@
-import { Connector, useMqttStore, useNeighbourhoodStore, ConnectionPair } from '@mirevi/puzzlecube-core'
+import { Connector, useMqttStore, useNeighbourhoodStore, CubeConnection } from '@mirevi/puzzlecube-core'
 import Header from './components/Header'
 import TestButton from './components/TestButtons'
 import CubeWindow from './components/cubedisplay/CubeWindow'
@@ -35,7 +35,7 @@ function App() {
     setMqttInitialized(true)
 
     // Subscribe to connectiopn pairs receivedc over MQTT - CAUTION: just subscribe once (here done by check for MQTT initialized)
-    const subscription = connectionPairSubject.subscribe((cp: ConnectionPair) => {
+    const subscription = connectionPairSubject.subscribe((cp: CubeConnection) => {
       console.log("connectionPair:" + JSON.stringify(cp))
       addHelloCube({ message: "got connection pair [" +JSON.stringify(cp)+"]", timestamp:Date.now().toString()})
     })
