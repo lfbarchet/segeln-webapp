@@ -30,7 +30,7 @@ npm run build
 npm run dev
 ```
 
-### Tet
+### Test
 * run local MQTT broker (e.g. with docker), configure for __websocketport 9001__ (https://github.com/vvatelot/mosquitto-docker-compose)
 * add .env.local with VALUES from .env fpor local MQTT broker
 * run unity app on your system
