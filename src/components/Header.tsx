@@ -12,7 +12,7 @@ const Header = () => {
         <div className='py-4 flex items-center justify-between  '>
           {/* LOGO */}
           <div className='flex items-center gap-x-1 md:gap-x-2'>
-            <p className='text-4xl md:text-6xl header-text'>CUBES PROJECT</p>
+            <p className='text-4xl md:text-6xl header-text'>SEGELN SPIEL</p>
           </div>
 
           {/* Connection, Mute & Settings */}

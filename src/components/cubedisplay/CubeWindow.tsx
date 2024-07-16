@@ -46,7 +46,7 @@ const CubeWindow = () => {
             </svg>
           )}
         </button>
-        {open && <CubeMode />}
+        {<CubeMode />}
       </div>
     </>
   );

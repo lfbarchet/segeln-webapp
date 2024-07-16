@@ -2,57 +2,99 @@ import { Connector, useMqttStore, useNeighbourhoodStore, CubeConnection } from '
 import Header from './components/Header'
 import TestButton from './components/TestButtons'
 import CubeWindow from './components/cubedisplay/CubeWindow'
+import EventManager from './components/EventManager'
 import { MqttCommunication } from './components/MqttCommunication'
-import { useState } from 'react'
-
-
-import {useHelloCubeStore} from './stores/useHelloCubeStore'
-
-
-// The Connector component is the entry point for the puzzlecube-core library.
-// It connects to the MQTT broker and handles the communication for the cube state.
-// It also provides default functions to send and receive messages.
-// The Connector connects to the default broker at 192.168.111.1 on the production server in the puzzlecube network.
-// It can be configured to connect to a different broker by passing the brokerUrl as a prop.
-// Example: <Connector brokerUrl='localhost:9001' />y
+import { useState, useEffect } from 'react'
+import { useHelloCubeStore } from './stores/useHelloCubeStore'
+import { texts } from './eventTexts';
+import React from 'react'
 
 function App() {
   const { connectionStatus } = useMqttStore()
-  const mqttCommunication = MqttCommunication()
   const [mqttInitialized, setMqttInitialized] = useState(false)
+  const [eventName, setEventName] = useState(1)
 
-  const {connectionPairSubject} = useNeighbourhoodStore()
-
-  const {addHelloCube} = useHelloCubeStore()
-  
-  
-  
-
-  // Check the connection status and subscribe to the app state topic and helloCubes topic and listen for messages
-  // This is done only once when the connection status changes to connected
-  if (connectionStatus === 'connected' && !mqttInitialized) {
-    mqttCommunication.subscribeAndListenToAppState()
-    setMqttInitialized(true)
-
-    // Subscribe to connectiopn pairs receivedc over MQTT - CAUTION: just subscribe once (here done by check for MQTT initialized)
-    const subscription = connectionPairSubject.subscribe((cp: CubeConnection) => {
-      console.log("connectionPair:" + JSON.stringify(cp))
-      addHelloCube({ message: "got connection pair [" +JSON.stringify(cp)+"]", timestamp:Date.now().toString()})
-    })
+  const handleEventReceived = (eventMessage) => {
+    if (!eventMessage.isStop){
+      setEventName(eventMessage.Type)
+    console.log(eventName)
+    }
+    
   }
 
-  
-  
-  
+  const mqttCommunication = MqttCommunication(handleEventReceived)
 
+  enum EventName {
+    SEA_MONSTER = 0,
+    SIRENE  = 1,
+    STORMY_SEA = 2,
+    KEIN_EVENT = 5
+  }
 
+  const handleStopEvent = () => {
+    const payload = {
+      name: eventName,
+      $type: "PerformanceEventState, Assembly-CSharp",
+      Type: eventName,
+      isStart: false,
+      isStop: true,
+      timestamp: new Date().toISOString(),
+    };
+    mqttCommunication.sendStopEvent(payload);
+    setEventName(100); // Clear the event name after stopping
+  }
 
+  useEffect(() => {
+    if (connectionStatus === 'connected' && !mqttInitialized) {
+      mqttCommunication.subscribeAndListenToAppState()
+      setMqttInitialized(true)
+    }
+  }, [connectionStatus, mqttInitialized])
+
+  const renderTextWithLineBreaks = (text: string) => {
+    return text.split('\n').map((str, index) => (
+      <React.Fragment key={index}>
+        {str}
+        <br />
+      </React.Fragment>
+    ));
+  };
+
+  console.log(eventName)
   return (
     <div className='flex relative'>
       <div className='px-7 min-h-screen h-fit bg-fft-yellow flex-1'>
-        <Connector brokerUrl={'ws://' + import.meta.env.VITE_MQTT_HOST + ':'+ import.meta.env.VITE_MQTT_PORT}  />
+        <Connector brokerUrl={'ws://' + import.meta.env.VITE_MQTT_HOST + ':' + import.meta.env.VITE_MQTT_PORT} />
         <Header />
-        <TestButton />
+        <div className="flex flex-col items-start mb-4">
+          <div className="w-full flex justify-between items-start mb-4">
+          <div className="flex flex-col items-start max-w-md">
+            <div className="text-lg font-medium mb-2">
+              {eventName != 100 
+                ? `Aktuelles Event: ${EventName[eventName]}`
+                : "Kein aktuelles Event"}
+            </div>
+            {eventName != 100 && (
+              <div className="break-words">
+                {renderTextWithLineBreaks(texts[eventName])}
+                <button
+                  onClick={handleStopEvent}
+                  className="px-4 py-2 mt-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+                >
+                  Stop Event
+                </button>
+              </div> 
+            )}
+          </div>
+
+            <div className="flex-1 flex justify-center">
+              <TestButton />
+            </div>
+            <div className="invisible">
+              {/* This invisible div helps balance the layout */}
+            </div>
+          </div>
+        </div>
         <CubeWindow />
       </div>
     </div>
